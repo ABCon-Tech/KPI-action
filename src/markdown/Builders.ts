@@ -1,152 +1,147 @@
-import { type } from "os";
-import { MdDocument } from "./MdDocument";
-import { MdHeading, MdInline, MdTable, MdTableColumn } from "./MdNode";
-import { Action, ContentPair, IMdBuilder, IMdNode, MdColumnAlignment, MdHeadingLevel,  } from "./types";
-
-
+import {MdDocument} from './MdDocument'
+import {MdHeading, MdInline, MdTable, MdTableColumn} from './MdNode'
+import {
+  Action,
+  ContentPair,
+  IMdBuilder,
+  MdColumnAlignment,
+  MdHeadingLevel
+} from './types'
 
 abstract class AbstractBuilder<T> implements IMdBuilder {
-    protected parent: IMdBuilder;
-    constructor(parent: IMdBuilder) {
-        this.parent = parent;
-    }
-    abstract build(): T
+  protected parent: IMdBuilder
+  constructor(parent: IMdBuilder) {
+    this.parent = parent
+  }
+  abstract build(): T
 }
 
 export class MdDocumentBuilder implements IMdBuilder {
-    filename: string;
-    childBuilders: Array<IMdBuilder> = [];
-    constructor(filename: string) {
-        this.filename = filename;
-    }
+  filename: string
+  childBuilders: IMdBuilder[] = []
+  constructor(filename: string) {
+    this.filename = filename
+  }
 
-    build(): MdDocument {
-        const doc = new MdDocument(this.filename);
-        this.childBuilders.map(b => doc.blocks.push(b.build()));
-        return doc;
-    }
+  build(): MdDocument {
+    const doc = new MdDocument(this.filename)
+    this.childBuilders.map(b => doc.blocks.push(b.build()))
+    return doc
+  }
 
-    heading(buildHeading: Action<MdHeadingBuilder>): MdDocumentBuilder {
-        var builder = new MdHeadingBuilder(this);
-        buildHeading(builder);
-        this.childBuilders.push(builder);
-        return this;
-    }
+  heading(buildHeading: Action<MdHeadingBuilder>): MdDocumentBuilder {
+    const builder = new MdHeadingBuilder(this)
+    buildHeading(builder)
+    this.childBuilders.push(builder)
+    return this
+  }
 
-    paragraph(buildParagraph: Action<MdInlineBuilder>): MdDocumentBuilder {
-        var builder = new MdInlineBuilder(this);
-        buildParagraph(builder);
-        this.childBuilders.push(builder);
-        return this;
-    }
+  paragraph(buildParagraph: Action<MdInlineBuilder>): MdDocumentBuilder {
+    const builder = new MdInlineBuilder(this)
+    buildParagraph(builder)
+    this.childBuilders.push(builder)
+    return this
+  }
 
-    table(buildTable: Action<MdTableBuilder>) {
-        var builder = new MdTableBuilder(this);
-        buildTable(builder);
-        this.childBuilders.push(builder);
-        return this;
-    }
+  table(buildTable: Action<MdTableBuilder>): MdDocumentBuilder {
+    const builder = new MdTableBuilder(this)
+    buildTable(builder)
+    this.childBuilders.push(builder)
+    return this
+  }
 }
 
 export class MdHeadingBuilder extends AbstractBuilder<MdHeading> {
-    
-    private contentBuilder!: MdInlineBuilder;
-    private _level: MdHeadingLevel = 1;
+  private contentBuilder!: MdInlineBuilder
+  private _level: MdHeadingLevel = 1
 
-    constructor(parent: IMdBuilder) {
-        super(parent)
-    }
+  contentString(content: string): MdHeadingBuilder {
+    this.content(i => i.text(content))
+    return this
+  }
 
-    contentString(content: string): MdHeadingBuilder {
-        this.content(i => i.text(content))
-        return this;
-    }
+  content(buildContent: Action<MdInlineBuilder>): MdHeadingBuilder {
+    const builder = new MdInlineBuilder(this)
+    buildContent(builder)
+    this.contentBuilder = builder
+    return this
+  }
 
-    content(buildContent: Action<MdInlineBuilder>): MdHeadingBuilder {
-        var builder = new MdInlineBuilder(this);
-        buildContent(builder);
-        this.contentBuilder = builder;
-        return this;
-    }
+  level(level: MdHeadingLevel): MdHeadingBuilder {
+    this._level = level
+    return this
+  }
 
-    level(level: MdHeadingLevel): MdHeadingBuilder {
-        this._level = level;
-        return this;
-    }
-
-    build(): MdHeading {
-        return new MdHeading(this.contentBuilder.build(), this._level)
-    }
+  build(): MdHeading {
+    return new MdHeading(this.contentBuilder.build(), this._level)
+  }
 }
 
 export class MdInlineBuilder extends AbstractBuilder<MdInline> {
-    private contents: Array<ContentPair> = [];
-    text(text: string): MdInlineBuilder {
-        this.contents.push({ type: "text", content: text })
-        return this
-    }
+  private contents: ContentPair[] = []
+  text(text: string): MdInlineBuilder {
+    this.contents.push({type: 'text', content: text})
+    return this
+  }
 
-    constructor(parent: IMdBuilder) {
-        super(parent)
-    }
-
-    build(): MdInline {
-        throw new Error("Method not implemented.");
-    }
-
+  build(): MdInline {
+    throw new Error('Method not implemented.')
+  }
 }
 
 export class MdTableBuilder extends AbstractBuilder<MdTable> {
-        columnCount = 0;
-    private columnbuilders: Array<{alignment:MdColumnAlignment, content: MdInlineBuilder}> = []
-    private rowsBuilder!: MdRowBuilder;
+  columnCount = 0
+  private columnbuilders: {
+    alignment: MdColumnAlignment
+    content: MdInlineBuilder
+  }[] = []
+  private rowsBuilder!: MdRowBuilder
 
-    constructor(parent: IMdBuilder) {
-        super(parent)
-    }
+  columnString(
+    text: string,
+    alignment: MdColumnAlignment = 'left'
+  ): MdTableBuilder {
+    this.column(i => i.text(text), alignment)
+    return this
+  }
 
-    columnString(text: string, alignment:MdColumnAlignment = "left"): MdTableBuilder {
-        this.column(i => i.text(text),alignment)
-        return this;
-    }
+  column(
+    buildContent: Action<MdInlineBuilder>,
+    alignment: MdColumnAlignment = 'left'
+  ): MdTableBuilder {
+    const builder = new MdInlineBuilder(this)
+    buildContent(builder)
+    this.columnbuilders.push({alignment, content: builder})
+    return this
+  }
 
-    column(buildContent: Action<MdInlineBuilder>, alignment:MdColumnAlignment = "left"): MdTableBuilder {
-        var builder = new MdInlineBuilder(this);
-        buildContent(builder);
-        this.columnbuilders.push({alignment, content: builder});
-        return this;
-    }
+  rows(buildRows: Action<MdRowBuilder>): MdTableBuilder {
+    const builder = new MdRowBuilder(this)
+    buildRows(builder)
+    this.rowsBuilder = builder
+    return this
+  }
 
-    rows(buildRows: Action<MdRowBuilder>): MdTableBuilder {
-        var builder = new MdRowBuilder(this);
-        buildRows(builder);
-        this.rowsBuilder = builder;
-        return this;
-    }
-
-    build(): MdTable {
-        const table = new MdTable()
-        const columns = this.columnbuilders.map(c => new MdTableColumn(c.content.build(),c.alignment))
-        const rows = this.rowsBuilder.build()
-        table.columns = columns;
-        table.rows = rows
-        return table;
-    }
+  build(): MdTable {
+    const table = new MdTable()
+    const columns = this.columnbuilders.map(
+      c => new MdTableColumn(c.content.build(), c.alignment)
+    )
+    const rows = this.rowsBuilder.build()
+    table.columns = columns
+    table.rows = rows
+    return table
+  }
 }
 
-export class MdRowBuilder extends AbstractBuilder<Array<Array<MdInline>>> {
-    rows: Array<Array<MdInlineBuilder>> = [];
-    constructor(parent: IMdBuilder) {
-        super(parent)
-    }
+export class MdRowBuilder extends AbstractBuilder<MdInline[][]> {
+  rows: MdInlineBuilder[][] = []
+  row(values: string[]): MdRowBuilder {
+    this.rows.push(values.map(v => new MdInlineBuilder(this).text(v)))
+    return this
+  }
 
-    row(values: (string)[]): MdRowBuilder {
-        this.rows.push(values.map(v => new MdInlineBuilder(this).text(v)));
-        return this;
-    }
-
-    build(): Array<Array<MdInline>> {
-        return this.rows.map(r => r.map(b => b.build()))
-    }
-
+  build(): MdInline[][] {
+    return this.rows.map(r => r.map(b => b.build()))
+  }
 }
