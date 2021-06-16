@@ -77,7 +77,7 @@ export class MdHeadingBuilder extends AbstractBuilder<MdHeading> {
   }
 }
 
-export class MdInlineBuilder extends AbstractBuilder<MdInline> {
+export class MdInlineBuilder extends AbstractBuilder<Array<MdInline>> {
   private contents: ContentPair[] = []
   text(text: string): MdInlineBuilder {
     this.contents.push({type: 'text', content: text})
@@ -85,7 +85,7 @@ export class MdInlineBuilder extends AbstractBuilder<MdInline> {
   }
 
   build(): MdInline {
-    throw new Error('Method not implemented.')
+    return MdInline.text()
   }
 }
 

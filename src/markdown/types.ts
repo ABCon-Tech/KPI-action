@@ -4,6 +4,7 @@ export interface IMdDocument extends IMdNode {
   filename: string
 }
 
+
 export enum MdNodeTypeEnum {
   document,
   block_quote,
@@ -20,7 +21,8 @@ export enum MdNodeTypeEnum {
   code_span,
   code_block,
   html_block,
-  table
+  table,
+  text
 }
 
 export interface IMdNode {
