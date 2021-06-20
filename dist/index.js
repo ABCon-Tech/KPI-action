@@ -168,7 +168,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.MdRowBuilder = exports.MdTableBuilder = exports.MdInlineBuilder = exports.MdHeadingBuilder = exports.MdDocumentBuilder = void 0;
+exports.MdRowBuilder = exports.MdTableBuilder = exports.MdInlineBuilder = exports.MdParagraphBuilder = exports.MdHeadingBuilder = exports.MdDocumentBuilder = void 0;
 const core = __importStar(__nccwpck_require__(2186));
 const MdDocument_1 = __nccwpck_require__(4619);
 const MdNode_1 = __nccwpck_require__(3868);
@@ -194,7 +194,7 @@ class MdDocumentBuilder {
         return this;
     }
     paragraph(buildParagraph) {
-        const builder = new MdInlineBuilder(this);
+        const builder = new MdParagraphBuilder(this);
         buildParagraph(builder);
         this.childBuilders.push(builder);
         return this;
@@ -233,6 +233,23 @@ class MdHeadingBuilder extends AbstractBuilder {
     }
 }
 exports.MdHeadingBuilder = MdHeadingBuilder;
+class MdParagraphBuilder extends AbstractBuilder {
+    constructor() {
+        super(...arguments);
+        //private contents: ContentPair[] = []
+        this.inlineBuilder = new MdInlineBuilder(this);
+    }
+    text(text) {
+        this.inlineBuilder.text(text);
+        return this;
+    }
+    build() {
+        const paragraph = new MdNode_1.MdParagraph();
+        paragraph.contents.push(this.inlineBuilder.build());
+        return paragraph;
+    }
+}
+exports.MdParagraphBuilder = MdParagraphBuilder;
 class MdInlineBuilder extends AbstractBuilder {
     constructor() {
         super(...arguments);
@@ -245,7 +262,7 @@ class MdInlineBuilder extends AbstractBuilder {
         return this;
     }
     build() {
-        let output = "";
+        let output = '';
         for (const part of this.contents) {
             core.info(`MdInlineBuilder.build => ${part.content.toString()}`);
             let text = part.content;
@@ -367,27 +384,30 @@ class MarkdownWriter {
             this.writeInline(stream, column.content);
             stream.write('|');
         }
-        stream.write('|');
-        for (let i = 1; i < table.columns.length; i++) {
+        stream.write('|\n');
+        for (let i = 0; i < table.columns.length; i++) {
             const alignment = table.columns[i - 1].alignment;
             alignment === 'center' ? stream.write(':') : stream.write(' ');
             stream.write('---');
             alignment !== 'left' ? stream.write(':') : stream.write(' ');
             stream.write('|');
         }
+        stream.write('|\n');
         for (const row of table.rows) {
             for (const cell of row) {
                 this.writeInline(stream, cell);
                 stream.write('|');
             }
+            stream.write('|\n');
         }
     }
     writeHeading(stream, heading) {
-        for (let i = 1; i < heading.level; i++) {
+        for (let i = 0; i < heading.level; i++) {
             stream.write('#');
         }
         stream.write(' ');
         this.writeInline(stream, heading.content);
+        stream.write('\n');
     }
     writeInline(stream, content) {
         core.info(`Writer: ${content.content}`);
@@ -397,6 +417,7 @@ class MarkdownWriter {
         for (const inline of paragraph.contents) {
             this.writeInline(stream, inline);
         }
+        stream.write('\n');
         stream.write('\n');
     }
 }

@@ -1,6 +1,12 @@
 import * as core from '@actions/core'
 import {MdDocument} from './MdDocument'
-import {MdHeading, MdInline, MdTable, MdTableColumn} from './MdNode'
+import {
+  MdHeading,
+  MdInline,
+  MdParagraph,
+  MdTable,
+  MdTableColumn
+} from './MdNode'
 import {
   Action,
   ContentPair,
@@ -37,8 +43,8 @@ export class MdDocumentBuilder implements IMdBuilder {
     return this
   }
 
-  paragraph(buildParagraph: Action<MdInlineBuilder>): MdDocumentBuilder {
-    const builder = new MdInlineBuilder(this)
+  paragraph(buildParagraph: Action<MdParagraphBuilder>): MdDocumentBuilder {
+    const builder = new MdParagraphBuilder(this)
     buildParagraph(builder)
     this.childBuilders.push(builder)
     return this
@@ -77,6 +83,21 @@ export class MdHeadingBuilder extends AbstractBuilder<MdHeading> {
     const inline = this.contentBuilder.build()
     core.info(`MdHeadingBuilder.build => ${inline.content}`)
     return new MdHeading(this.contentBuilder.build(), this._level)
+  }
+}
+
+export class MdParagraphBuilder extends AbstractBuilder<MdParagraph> {
+  //private contents: ContentPair[] = []
+  private inlineBuilder: MdInlineBuilder = new MdInlineBuilder(this)
+  text(text: string): MdParagraphBuilder {
+    this.inlineBuilder.text(text)
+    return this
+  }
+
+  build(): MdParagraph {
+    const paragraph = new MdParagraph()
+    paragraph.contents.push(this.inlineBuilder.build())
+    return paragraph
   }
 }
 

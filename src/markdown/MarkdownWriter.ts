@@ -39,30 +39,33 @@ export class MarkdownWriter {
       this.writeInline(stream, column.content)
       stream.write('|')
     }
-    stream.write('|')
+    stream.write('|\n')
 
-    for (let i = 1; i < table.columns.length; i++) {
+    for (let i = 0; i < table.columns.length; i++) {
       const alignment = table.columns[i - 1].alignment
       alignment === 'center' ? stream.write(':') : stream.write(' ')
       stream.write('---')
       alignment !== 'left' ? stream.write(':') : stream.write(' ')
       stream.write('|')
     }
+    stream.write('|\n')
 
     for (const row of table.rows) {
       for (const cell of row) {
         this.writeInline(stream, cell)
         stream.write('|')
       }
+      stream.write('|\n')
     }
   }
 
   writeHeading(stream: fs.WriteStream, heading: MdHeading): void {
-    for (let i = 1; i < heading.level; i++) {
+    for (let i = 0; i < heading.level; i++) {
       stream.write('#')
     }
     stream.write(' ')
     this.writeInline(stream, heading.content)
+    stream.write('\n')
   }
 
   writeInline(stream: fs.WriteStream, content: MdInline): void {
@@ -74,6 +77,7 @@ export class MarkdownWriter {
     for (const inline of paragraph.contents) {
       this.writeInline(stream, inline)
     }
+    stream.write('\n')
     stream.write('\n')
   }
 }
