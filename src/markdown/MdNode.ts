@@ -84,16 +84,16 @@ export class MdInline extends MdNode {
   content: string
   constructor(content: string, nodeType: MdNodeTypeEnum, parent?: IMdNode) {
     super(nodeType, parent)
-    this.content = content;
+    this.content = content
   }
 
-  static text(content:string):MdInline {
+  static text(content: string): MdInline {
     return new MdInline(content, MdNodeTypeEnum.text)
   }
-  static strong(content:string):MdInline {
+  static strong(content: string): MdInline {
     return new MdInline(content, MdNodeTypeEnum.strong)
   }
-  static emphasis(content:string):MdInline {
+  static emphasis(content: string): MdInline {
     return new MdInline(content, MdNodeTypeEnum.emph)
   }
 }

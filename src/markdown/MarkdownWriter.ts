@@ -63,7 +63,9 @@ export class MarkdownWriter {
     this.writeInline(stream, heading.content)
   }
 
-  writeInline(stream: fs.WriteStream, content: MdInline): void {}
+  writeInline(stream: fs.WriteStream, content: MdInline): void {
+    stream.write(content.content)
+  }
 
   writePragraph(stream: fs.WriteStream, paragraph: MdParagraph): void {
     for (const inline of paragraph.contents) {
