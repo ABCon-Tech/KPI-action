@@ -75,7 +75,7 @@ export class MdHeadingBuilder extends AbstractBuilder<MdHeading> {
 
   build(): MdHeading {
     const inline = this.contentBuilder.build()
-    core.info(`MdHeadingBuilder: ${inline.content}`)
+    core.info(`MdHeadingBuilder.build => ${inline.content}`)
     return new MdHeading(this.contentBuilder.build(), this._level)
   }
 }
@@ -93,7 +93,9 @@ export class MdInlineBuilder extends AbstractBuilder<MdInline> {
     let string = ''
     for (const part of this.contents) {
       core.info(`MdInlineBuilder.build => ${part.content.toString()}`)
-      string.concat(part.content as string)
+      let text = part.content as string
+      core.info(`MdInlineBuilder.build-cast => ${text}`)
+      string.concat(text)
     }
 
     return MdInline.text(string)

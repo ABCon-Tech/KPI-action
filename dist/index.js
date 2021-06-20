@@ -228,7 +228,7 @@ class MdHeadingBuilder extends AbstractBuilder {
     }
     build() {
         const inline = this.contentBuilder.build();
-        core.info(`MdHeadingBuilder: ${inline.content}`);
+        core.info(`MdHeadingBuilder.build => ${inline.content}`);
         return new MdNode_1.MdHeading(this.contentBuilder.build(), this._level);
     }
 }
@@ -245,10 +245,12 @@ class MdInlineBuilder extends AbstractBuilder {
         return this;
     }
     build() {
-        let string = "";
+        let string = '';
         for (const part of this.contents) {
             core.info(`MdInlineBuilder.build => ${part.content.toString()}`);
-            string.concat(part.content);
+            let text = part.content;
+            core.info(`MdInlineBuilder.build-cast => ${text}`);
+            string.concat(text);
         }
         return MdNode_1.MdInline.text(string);
     }
