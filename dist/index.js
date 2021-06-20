@@ -384,7 +384,7 @@ class MarkdownWriter {
             this.writeInline(stream, column.content);
             stream.write('|');
         }
-        stream.write('|\n');
+        stream.write('\n');
         for (let i = 0; i < table.columns.length; i++) {
             const alignment = table.columns[i].alignment;
             alignment === 'center' ? stream.write(':') : stream.write(' ');
@@ -392,13 +392,13 @@ class MarkdownWriter {
             alignment !== 'left' ? stream.write(':') : stream.write(' ');
             stream.write('|');
         }
-        stream.write('|\n');
+        stream.write('\n');
         for (const row of table.rows) {
             for (const cell of row) {
                 this.writeInline(stream, cell);
                 stream.write('|');
             }
-            stream.write('|\n');
+            stream.write('\n');
         }
     }
     writeHeading(stream, heading) {
