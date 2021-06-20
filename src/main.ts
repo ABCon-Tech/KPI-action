@@ -7,8 +7,8 @@ async function run(): Promise<void> {
   try {
     const token = core.getInput('repo-token', {required: true})
     const outputDirectory = core.getInput('output-directory', {required: true})
-    await io.mkdirP(outputDirectory);
-    
+    await io.mkdirP(outputDirectory)
+
     const octokit = github.getOctokit(token)
     const owner = github.context.repo.owner
     const repo = github.context.repo.repo
