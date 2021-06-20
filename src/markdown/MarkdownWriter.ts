@@ -65,7 +65,7 @@ export class MarkdownWriter {
   }
 
   writeInline(stream: fs.WriteStream, content: MdInline): void {
-    core.debug(`Writer: ${content.content}`)
+    core.info(`Writer: ${content.content}`)
     stream.write(content.content)
   }
 

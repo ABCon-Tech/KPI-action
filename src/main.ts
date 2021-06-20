@@ -62,8 +62,8 @@ async function run(): Promise<void> {
       }
     }
 
-    core.debug(`Total Number of Issues: ${issueCount.toString()}`)
-    core.debug(`Total Number of Pull Requests: ${pullCount.toString()}`)
+    core.info(`Total Number of Issues: ${issueCount.toString()}`)
+    core.info(`Total Number of Pull Requests: ${pullCount.toString()}`)
 
     const summaryBuilder = new MdDocumentBuilder('Summary')
     summaryBuilder

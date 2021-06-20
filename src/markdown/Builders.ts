@@ -91,7 +91,7 @@ export class MdInlineBuilder extends AbstractBuilder<MdInline> {
     for (const part of this.contents) {
       string.concat(part.content as string)
     }
-    core.debug(this.contents.toString())
+    core.info(this.contents.toString())
     return MdInline.text(string)
   }
 }
