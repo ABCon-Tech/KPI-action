@@ -42,7 +42,7 @@ export class MarkdownWriter {
     stream.write('|\n')
 
     for (let i = 0; i < table.columns.length; i++) {
-      const alignment = table.columns[i - 1].alignment
+      const alignment = table.columns[i].alignment
       alignment === 'center' ? stream.write(':') : stream.write(' ')
       stream.write('---')
       alignment !== 'left' ? stream.write(':') : stream.write(' ')
