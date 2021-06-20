@@ -241,7 +241,7 @@ class MdInlineBuilder extends AbstractBuilder {
         return this;
     }
     build() {
-        const string = '';
+        let string = '';
         for (const part of this.contents) {
             string.concat(part.content);
             core.info(part.content.toString());

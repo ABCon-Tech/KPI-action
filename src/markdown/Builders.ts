@@ -87,7 +87,7 @@ export class MdInlineBuilder extends AbstractBuilder<MdInline> {
   }
 
   build(): MdInline {
-    const string = ''
+    let string = ''
 
     for (const part of this.contents) {
       string.concat(part.content as string)
