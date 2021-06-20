@@ -17,7 +17,8 @@ async function run(): Promise<void> {
 
     const {data} = await octokit.rest.issues.listForRepo({
       owner,
-      repo
+      repo,
+      state: 'all'
     })
 
     let issueCount = 0,

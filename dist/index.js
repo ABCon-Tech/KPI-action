@@ -52,7 +52,8 @@ function run() {
             const lastRunDate = minusDays(runDate, 7);
             const { data } = yield octokit.rest.issues.listForRepo({
                 owner,
-                repo
+                repo,
+                state: 'all'
             });
             let issueCount = 0, pullCount = 0, openIssues = 0, closedIssues = 0, openPulls = 0, closedPulls = 0, openIssuesWeek = 0, closedIssuesWeek = 0, openPullsWeek = 0, closedPullsWeek = 0;
             const issues = [];
@@ -235,6 +236,7 @@ class MdInlineBuilder extends AbstractBuilder {
         this.contents = [];
     }
     text(text) {
+        core.info(`MdInlineBuilder.text => ${text}`);
         this.contents.push({ type: 'text', content: text });
         return this;
     }
@@ -242,8 +244,8 @@ class MdInlineBuilder extends AbstractBuilder {
         const string = '';
         for (const part of this.contents) {
             string.concat(part.content);
+            core.info(part.content.toString());
         }
-        core.info(this.contents.toString());
         return MdNode_1.MdInline.text(string);
     }
 }

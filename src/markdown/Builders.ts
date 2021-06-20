@@ -81,6 +81,7 @@ export class MdHeadingBuilder extends AbstractBuilder<MdHeading> {
 export class MdInlineBuilder extends AbstractBuilder<MdInline> {
   private contents: ContentPair[] = []
   text(text: string): MdInlineBuilder {
+    core.info(`MdInlineBuilder.text => ${text}`)
     this.contents.push({type: 'text', content: text})
     return this
   }
@@ -90,8 +91,9 @@ export class MdInlineBuilder extends AbstractBuilder<MdInline> {
 
     for (const part of this.contents) {
       string.concat(part.content as string)
+      core.info(part.content.toString())
     }
-    core.info(this.contents.toString())
+
     return MdInline.text(string)
   }
 }
