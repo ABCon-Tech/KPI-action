@@ -88,6 +88,8 @@ function run() {
                     issues.push(issue);
                 }
             }
+            core.debug(`Total Number of Issues: ${issueCount.toString()}`);
+            core.debug(`Total Number of Pull Requests: ${pullCount.toString()}`);
             const summaryBuilder = new Builders_1.MdDocumentBuilder('Summary');
             summaryBuilder
                 .heading(h => h.level(1).contentString('Progress Summary'))
@@ -95,7 +97,7 @@ function run() {
                 .text('Progress summary for IFC-Specification development upto: ')
                 .text(runDate.toLocaleString()))
                 .paragraph(p => p.text('Total Number of Issues: ').text(issueCount.toString()))
-                .paragraph(p => p.text('Total Number of Pull Requests:').text(pullCount.toString()))
+                .paragraph(p => p.text('Total Number of Pull Requests: ').text(pullCount.toString()))
                 .heading(h => h.level(2).contentString('Summary Table'))
                 .table(t => t
                 .columnString('Indicator')
@@ -140,12 +142,32 @@ function minusDays(date, days) {
 /***/ }),
 
 /***/ 7931:
-/***/ ((__unused_webpack_module, exports, __nccwpck_require__) => {
+/***/ (function(__unused_webpack_module, exports, __nccwpck_require__) {
 
 "use strict";
 
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.MdRowBuilder = exports.MdTableBuilder = exports.MdInlineBuilder = exports.MdHeadingBuilder = exports.MdDocumentBuilder = void 0;
+const core = __importStar(__nccwpck_require__(2186));
 const MdDocument_1 = __nccwpck_require__(4619);
 const MdNode_1 = __nccwpck_require__(3868);
 class AbstractBuilder {
@@ -221,6 +243,7 @@ class MdInlineBuilder extends AbstractBuilder {
         for (const part of this.contents) {
             string.concat(part.content);
         }
+        core.debug(this.contents.toString());
         return MdNode_1.MdInline.text(string);
     }
 }
@@ -301,6 +324,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.MarkdownWriter = void 0;
+const core = __importStar(__nccwpck_require__(2186));
 const fs = __importStar(__nccwpck_require__(5747));
 const types_1 = __nccwpck_require__(979);
 class MarkdownWriter {
@@ -356,6 +380,7 @@ class MarkdownWriter {
         this.writeInline(stream, heading.content);
     }
     writeInline(stream, content) {
+        core.debug(`Writer: ${content.content}`);
         stream.write(content.content);
     }
     writePragraph(stream, paragraph) {

@@ -1,3 +1,4 @@
+import * as core from '@actions/core'
 import {MdDocument} from './MdDocument'
 import {MdHeading, MdInline, MdTable, MdTableColumn} from './MdNode'
 import {
@@ -90,6 +91,7 @@ export class MdInlineBuilder extends AbstractBuilder<MdInline> {
     for (const part of this.contents) {
       string.concat(part.content as string)
     }
+    core.debug(this.contents.toString())
     return MdInline.text(string)
   }
 }

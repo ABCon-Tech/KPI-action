@@ -62,6 +62,9 @@ async function run(): Promise<void> {
       }
     }
 
+    core.debug(`Total Number of Issues: ${issueCount.toString()}`)
+    core.debug(`Total Number of Pull Requests: ${pullCount.toString()}`)
+
     const summaryBuilder = new MdDocumentBuilder('Summary')
     summaryBuilder
       .heading(h => h.level(1).contentString('Progress Summary'))
@@ -74,7 +77,7 @@ async function run(): Promise<void> {
         p.text('Total Number of Issues: ').text(issueCount.toString())
       )
       .paragraph(p =>
-        p.text('Total Number of Pull Requests:').text(pullCount.toString())
+        p.text('Total Number of Pull Requests: ').text(pullCount.toString())
       )
       .heading(h => h.level(2).contentString('Summary Table'))
       .table(t =>

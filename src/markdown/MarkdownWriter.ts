@@ -1,3 +1,4 @@
+import * as core from '@actions/core'
 import * as fs from 'fs'
 import {MdDocument} from './MdDocument'
 import {MdBlock, MdHeading, MdInline, MdParagraph, MdTable} from './MdNode'
@@ -64,6 +65,7 @@ export class MarkdownWriter {
   }
 
   writeInline(stream: fs.WriteStream, content: MdInline): void {
+    core.debug(`Writer: ${content.content}`)
     stream.write(content.content)
   }
 
