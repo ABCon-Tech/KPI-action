@@ -74,6 +74,8 @@ export class MdHeadingBuilder extends AbstractBuilder<MdHeading> {
   }
 
   build(): MdHeading {
+    const inline = this.contentBuilder.build()
+    core.info(`MdHeadingBuilder: ${inline.content}`)
     return new MdHeading(this.contentBuilder.build(), this._level)
   }
 }

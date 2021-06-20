@@ -126,6 +126,7 @@ function run() {
                 closedPullsWeek.toString()
             ])));
             const summary = summaryBuilder.build();
+            core.info(summary.blocks[0].content.content);
             summary.Save(outputDirectory);
         }
         catch (error) {
@@ -226,6 +227,8 @@ class MdHeadingBuilder extends AbstractBuilder {
         return this;
     }
     build() {
+        const inline = this.contentBuilder.build();
+        core.info(`MdHeadingBuilder: ${inline.content}`);
         return new MdNode_1.MdHeading(this.contentBuilder.build(), this._level);
     }
 }
@@ -334,6 +337,7 @@ class MarkdownWriter {
     save(document, filename) {
         const stream = fs.createWriteStream(filename);
         this.writeDocument(stream, document);
+        stream.end();
     }
     writeDocument(stream, document) {
         for (const block of document.blocks) {

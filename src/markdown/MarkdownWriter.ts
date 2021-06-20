@@ -10,6 +10,7 @@ export class MarkdownWriter {
   save(document: MdDocument, filename: string): void {
     const stream = fs.createWriteStream(filename)
     this.writeDocument(stream, document)
+    stream.end()
   }
 
   private writeDocument(stream: fs.WriteStream, document: MdDocument): void {

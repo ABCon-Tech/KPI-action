@@ -1,6 +1,7 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
 import * as io from '@actions/io'
+import {MdHeading} from './markdown'
 import {MdDocumentBuilder} from './markdown/Builders'
 
 async function run(): Promise<void> {
@@ -112,6 +113,7 @@ async function run(): Promise<void> {
       )
 
     const summary = summaryBuilder.build()
+    core.info((summary.blocks[0] as MdHeading).content.content)
     summary.Save(outputDirectory)
   } catch (error) {
     core.setFailed(error.message)
