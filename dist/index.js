@@ -236,6 +236,7 @@ exports.MdHeadingBuilder = MdHeadingBuilder;
 class MdInlineBuilder extends AbstractBuilder {
     constructor() {
         super(...arguments);
+        //private contents: ContentPair[] = []
         this.contents = [];
     }
     text(text) {
@@ -244,10 +245,10 @@ class MdInlineBuilder extends AbstractBuilder {
         return this;
     }
     build() {
-        let string = '';
+        let string = "";
         for (const part of this.contents) {
+            core.info(`MdInlineBuilder.build => ${part.content.toString()}`);
             string.concat(part.content);
-            core.info(part.content.toString());
         }
         return MdNode_1.MdInline.text(string);
     }
