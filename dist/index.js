@@ -245,14 +245,15 @@ class MdInlineBuilder extends AbstractBuilder {
         return this;
     }
     build() {
-        let string = '';
+        let output = "";
         for (const part of this.contents) {
             core.info(`MdInlineBuilder.build => ${part.content.toString()}`);
             let text = part.content;
             core.info(`MdInlineBuilder.build-cast => ${text}`);
-            string.concat(text);
+            output = output + text;
         }
-        return MdNode_1.MdInline.text(string);
+        core.info(`MdInlineBuilder.build-finished => ${output}`);
+        return MdNode_1.MdInline.text(output);
     }
 }
 exports.MdInlineBuilder = MdInlineBuilder;

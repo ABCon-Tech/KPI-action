@@ -90,15 +90,15 @@ export class MdInlineBuilder extends AbstractBuilder<MdInline> {
   }
 
   build(): MdInline {
-    let string = ''
+    let output = ''
     for (const part of this.contents) {
       core.info(`MdInlineBuilder.build => ${part.content.toString()}`)
       let text = part.content as string
       core.info(`MdInlineBuilder.build-cast => ${text}`)
-      string.concat(text)
+      output = output + text
     }
-
-    return MdInline.text(string)
+    core.info(`MdInlineBuilder.build-finished => ${output}`)
+    return MdInline.text(output)
   }
 }
 
