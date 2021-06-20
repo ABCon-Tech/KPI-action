@@ -77,11 +77,23 @@ export class MdTableColumn {
   constructor(content: MdInline, alignment: MdColumnAlignment = 'left') {
     this.content = content
     this.alignment = alignment
-  }-
+  }
 }
 
 export class MdInline extends MdNode {
-  constructor(nodeType: MdNodeTypeEnum, parent?: IMdNode) {
+  content: string
+  constructor(content: string, nodeType: MdNodeTypeEnum, parent?: IMdNode) {
     super(nodeType, parent)
+    this.content = content
+  }
+
+  static text(content: string): MdInline {
+    return new MdInline(content, MdNodeTypeEnum.text)
+  }
+  static strong(content: string): MdInline {
+    return new MdInline(content, MdNodeTypeEnum.strong)
+  }
+  static emphasis(content: string): MdInline {
+    return new MdInline(content, MdNodeTypeEnum.emph)
   }
 }

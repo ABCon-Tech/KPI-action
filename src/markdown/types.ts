@@ -20,7 +20,8 @@ export enum MdNodeTypeEnum {
   code_span,
   code_block,
   html_block,
-  table
+  table,
+  text
 }
 
 export interface IMdNode {
@@ -38,6 +39,6 @@ export interface ContentPair {
   content: MdInlineBuilder | string
 }
 
-export type Action<T> = (Arg: T) => void
+export type Action<T> = (configuration: T) => void
 export type MdHeadingLevel = 1 | 2 | 3 | 4 | 5 | 6
 export type MdColumnAlignment = 'left' | 'center' | 'right'

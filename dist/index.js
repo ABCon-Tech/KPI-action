@@ -42,8 +42,8 @@ const Builders_1 = __webpack_require__(7931);
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const token = core.getInput("repo-token", { required: true });
-            const outputDirectory = core.getInput("output-directory", { required: true });
+            const token = core.getInput('repo-token', { required: true });
+            const outputDirectory = core.getInput('output-directory', { required: true });
             const octokit = github.getOctokit(token);
             const owner = github.context.repo.owner;
             const repo = github.context.repo.repo;
@@ -57,42 +57,70 @@ function run() {
             const issues = [];
             const pulls = [];
             //Sorting and data processing
-            data.forEach((issue) => {
-                if (issue.hasOwnProperty("pull_request")) {
+            for (const issue of data) {
+                if (issue.hasOwnProperty('pull_request')) {
                     pullCount++;
-                    if (issue.state == "open") {
+                    if (issue.state === 'open') {
                         openPulls++;
                         new Date(issue.created_at) > lastRunDate && openPullsWeek++;
                     }
                     else {
                         closedPulls++;
-                        issue.closed_at && new Date(issue.closed_at) > lastRunDate && closedPullsWeek++;
+                        issue.closed_at &&
+                            new Date(issue.closed_at) > lastRunDate &&
+                            closedPullsWeek++;
                     }
                     pulls.push(issue);
                 }
                 else {
                     issueCount++;
-                    ;
-                    if (issue.state == "open") {
+                    if (issue.state === 'open') {
                         openIssues++;
                         new Date(issue.created_at) > lastRunDate && openIssuesWeek++;
                     }
                     else {
                         closedIssues++;
-                        issue.closed_at && new Date(issue.closed_at) > lastRunDate && closedIssuesWeek++;
+                        issue.closed_at &&
+                            new Date(issue.closed_at) > lastRunDate &&
+                            closedIssuesWeek++;
                     }
                     issues.push(issue);
                 }
-            });
-            const summaryBuilder = new Builders_1.MdDocumentBuilder("Summary");
-            summaryBuilder.heading(h => h.level(1).contentString("Progress Summary"))
-                .paragraph(p => p.text("Progress summary for IFC-Specification development upto: ").text(runDate.toLocaleString()))
-                .heading(h => h.level(2).contentString("Summary Table"))
-                .table(t => t.columnString("Indicator").columnString("Open").columnString("Closed")
-                .rows(r => r.row(["Total Issues", openIssues.toString(), closedIssues.toString()])
-                .row(["Total Pull Requests", openPulls.toString(), closedPulls.toString()])
-                .row(["Issues This Week", openIssuesWeek.toString(), closedIssuesWeek.toString()])
-                .row(["Pull Requests This Week", openPullsWeek.toString(), closedPullsWeek.toString()])));
+            }
+            const summaryBuilder = new Builders_1.MdDocumentBuilder('Summary');
+            summaryBuilder
+                .heading(h => h.level(1).contentString('Progress Summary'))
+                .paragraph(p => p
+                .text('Progress summary for IFC-Specification development upto: ')
+                .text(runDate.toLocaleString()))
+                .paragraph(p => p.text('Total Number of Issues: ').text(issueCount.toString()))
+                .paragraph(p => p.text('Total Number of Pull Requests:').text(pullCount.toString()))
+                .heading(h => h.level(2).contentString('Summary Table'))
+                .table(t => t
+                .columnString('Indicator')
+                .columnString('Open')
+                .columnString('Closed')
+                .rows(r => r
+                .row([
+                'Total Issues',
+                openIssues.toString(),
+                closedIssues.toString()
+            ])
+                .row([
+                'Total Pull Requests',
+                openPulls.toString(),
+                closedPulls.toString()
+            ])
+                .row([
+                'Issues This Week',
+                openIssuesWeek.toString(),
+                closedIssuesWeek.toString()
+            ])
+                .row([
+                'Pull Requests This Week',
+                openPullsWeek.toString(),
+                closedPullsWeek.toString()
+            ])));
             const summary = summaryBuilder.build();
             summary.Save(outputDirectory);
         }
@@ -103,7 +131,7 @@ function run() {
 }
 run();
 function minusDays(date, days) {
-    var ms = date.getMilliseconds() - (days * 24 * 60 * 1000);
+    const ms = date.getMilliseconds() - days * 24 * 60 * 1000;
     return new Date(ms);
 }
 
@@ -135,19 +163,19 @@ class MdDocumentBuilder {
         return doc;
     }
     heading(buildHeading) {
-        var builder = new MdHeadingBuilder(this);
+        const builder = new MdHeadingBuilder(this);
         buildHeading(builder);
         this.childBuilders.push(builder);
         return this;
     }
     paragraph(buildParagraph) {
-        var builder = new MdInlineBuilder(this);
+        const builder = new MdInlineBuilder(this);
         buildParagraph(builder);
         this.childBuilders.push(builder);
         return this;
     }
     table(buildTable) {
-        var builder = new MdTableBuilder(this);
+        const builder = new MdTableBuilder(this);
         buildTable(builder);
         this.childBuilders.push(builder);
         return this;
@@ -155,8 +183,8 @@ class MdDocumentBuilder {
 }
 exports.MdDocumentBuilder = MdDocumentBuilder;
 class MdHeadingBuilder extends AbstractBuilder {
-    constructor(parent) {
-        super(parent);
+    constructor() {
+        super(...arguments);
         this._level = 1;
     }
     contentString(content) {
@@ -164,7 +192,7 @@ class MdHeadingBuilder extends AbstractBuilder {
         return this;
     }
     content(buildContent) {
-        var builder = new MdInlineBuilder(this);
+        const builder = new MdInlineBuilder(this);
         buildContent(builder);
         this.contentBuilder = builder;
         return this;
@@ -179,37 +207,41 @@ class MdHeadingBuilder extends AbstractBuilder {
 }
 exports.MdHeadingBuilder = MdHeadingBuilder;
 class MdInlineBuilder extends AbstractBuilder {
-    constructor(parent) {
-        super(parent);
+    constructor() {
+        super(...arguments);
         this.contents = [];
     }
     text(text) {
-        this.contents.push({ type: "text", content: text });
+        this.contents.push({ type: 'text', content: text });
         return this;
     }
     build() {
-        throw new Error("Method not implemented.");
+        const string = '';
+        for (const part of this.contents) {
+            string.concat(part.content);
+        }
+        return MdNode_1.MdInline.text(string);
     }
 }
 exports.MdInlineBuilder = MdInlineBuilder;
 class MdTableBuilder extends AbstractBuilder {
-    constructor(parent) {
-        super(parent);
+    constructor() {
+        super(...arguments);
         this.columnCount = 0;
         this.columnbuilders = [];
     }
-    columnString(text, alignment = "left") {
+    columnString(text, alignment = 'left') {
         this.column(i => i.text(text), alignment);
         return this;
     }
-    column(buildContent, alignment = "left") {
-        var builder = new MdInlineBuilder(this);
+    column(buildContent, alignment = 'left') {
+        const builder = new MdInlineBuilder(this);
         buildContent(builder);
         this.columnbuilders.push({ alignment, content: builder });
         return this;
     }
     rows(buildRows) {
-        var builder = new MdRowBuilder(this);
+        const builder = new MdRowBuilder(this);
         buildRows(builder);
         this.rowsBuilder = builder;
         return this;
@@ -225,8 +257,8 @@ class MdTableBuilder extends AbstractBuilder {
 }
 exports.MdTableBuilder = MdTableBuilder;
 class MdRowBuilder extends AbstractBuilder {
-    constructor(parent) {
-        super(parent);
+    constructor() {
+        super(...arguments);
         this.rows = [];
     }
     row(values) {
@@ -266,27 +298,15 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.MarkdownWriter = void 0;
 const fs = __importStar(__webpack_require__(5747));
 const types_1 = __webpack_require__(979);
 class MarkdownWriter {
-    constructor( /*TODO MarkdownWriterOptions */) {
-    }
+    //constructor(/*TODO MarkdownWriterOptions */) {}
     save(document, filename) {
-        return __awaiter(this, void 0, void 0, function* () {
-            var stream = fs.createWriteStream(filename);
-            this.writeDocument(stream, document);
-        });
+        const stream = fs.createWriteStream(filename);
+        this.writeDocument(stream, document);
     }
     writeDocument(stream, document) {
         for (const block of document.blocks) {
@@ -297,47 +317,51 @@ class MarkdownWriter {
         switch (block.nodeType) {
             case types_1.MdNodeTypeEnum.paragraph:
                 this.writePragraph(stream, block);
+                break;
             case types_1.MdNodeTypeEnum.heading:
                 this.writeHeading(stream, block);
+                break;
             case types_1.MdNodeTypeEnum.table:
                 this.writeTable(stream, block);
+                break;
         }
     }
     writeTable(stream, table) {
-        stream.write("|");
+        stream.write('|');
         for (const column of table.columns) {
             this.writeInline(stream, column.content);
-            stream.write("|");
+            stream.write('|');
         }
-        stream.write("|");
+        stream.write('|');
         for (let i = 1; i < table.columns.length; i++) {
             const alignment = table.columns[i - 1].alignment;
-            alignment == "center" ? stream.write(":") : stream.write(" ");
-            stream.write("---");
-            alignment != "left" ? stream.write(":") : stream.write(" ");
-            stream.write("|");
+            alignment === 'center' ? stream.write(':') : stream.write(' ');
+            stream.write('---');
+            alignment !== 'left' ? stream.write(':') : stream.write(' ');
+            stream.write('|');
         }
         for (const row of table.rows) {
             for (const cell of row) {
                 this.writeInline(stream, cell);
-                stream.write("|");
+                stream.write('|');
             }
         }
     }
     writeHeading(stream, heading) {
         for (let i = 1; i < heading.level; i++) {
-            stream.write("#");
+            stream.write('#');
         }
-        stream.write(" ");
+        stream.write(' ');
         this.writeInline(stream, heading.content);
     }
     writeInline(stream, content) {
+        stream.write(content.content);
     }
     writePragraph(stream, paragraph) {
         for (const inline of paragraph.contents) {
             this.writeInline(stream, inline);
         }
-        stream.write("\n");
+        stream.write('\n');
     }
 }
 exports.MarkdownWriter = MarkdownWriter;
@@ -346,19 +370,10 @@ exports.MarkdownWriter = MarkdownWriter;
 /***/ }),
 
 /***/ 4619:
-/***/ (function(__unused_webpack_module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 "use strict";
 
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
-};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.MdDocument = void 0;
 const MdNode_1 = __webpack_require__(3868);
@@ -371,10 +386,8 @@ class MdDocument extends MdNode_1.MdNode {
         this.filename = filename;
     }
     Save(outputDirectory) {
-        return __awaiter(this, void 0, void 0, function* () {
-            var writer = new MarkdownWriter_1.MarkdownWriter();
-            yield writer.save(this, outputDirectory + "/" + this.filename + ".md");
-        });
+        const writer = new MarkdownWriter_1.MarkdownWriter();
+        writer.save(this, `${outputDirectory}/${this.filename}.md`);
     }
 }
 exports.MdDocument = MdDocument;
@@ -388,7 +401,7 @@ exports.MdDocument = MdDocument;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.MdInline = exports.MdTableColumn = exports.MdTable = exports.MdParagraph = exports.MdHeading = exports.MdLeafBlock = exports.MdContainerBlock = exports.MdBlock = exports.MdNode = exports.isContainer = void 0;
+exports.MdInline = exports.MdTableColumn = exports.MdTable = exports.MdParagraph = exports.MdHeading = exports.MdContainerBlock = exports.MdBlock = exports.MdNode = exports.isContainer = void 0;
 const types_1 = __webpack_require__(979);
 function isContainer(node) {
     switch (node.nodeType) {
@@ -412,32 +425,21 @@ function isContainer(node) {
 exports.isContainer = isContainer;
 class MdNode {
     constructor(nodeType, parent = undefined) {
-        this.isContainer = isContainer(this);
         this.nodeType = nodeType;
         this.parent = parent;
     }
 }
 exports.MdNode = MdNode;
 class MdBlock extends MdNode {
-    constructor(nodeType, parent) {
-        super(nodeType, parent);
-    }
 }
 exports.MdBlock = MdBlock;
 class MdContainerBlock extends MdBlock {
-    constructor(nodeType, parent) {
-        super(nodeType, parent);
+    constructor() {
+        super(...arguments);
         this.children = [];
     }
 }
 exports.MdContainerBlock = MdContainerBlock;
-class MdLeafBlock extends MdBlock {
-    constructor(nodeType, parent) {
-        super(nodeType, parent);
-        this.children = [];
-    }
-}
-exports.MdLeafBlock = MdLeafBlock;
 class MdHeading extends MdBlock {
     constructor(content, level = 1, parent) {
         super(types_1.MdNodeTypeEnum.heading, parent);
@@ -463,15 +465,25 @@ class MdTable extends MdBlock {
 }
 exports.MdTable = MdTable;
 class MdTableColumn {
-    constructor(content, alignment = "left") {
+    constructor(content, alignment = 'left') {
         this.content = content;
         this.alignment = alignment;
     }
 }
 exports.MdTableColumn = MdTableColumn;
 class MdInline extends MdNode {
-    constructor(nodeType, parent) {
+    constructor(content, nodeType, parent) {
         super(nodeType, parent);
+        this.content = content;
+    }
+    static text(content) {
+        return new MdInline(content, types_1.MdNodeTypeEnum.text);
+    }
+    static strong(content) {
+        return new MdInline(content, types_1.MdNodeTypeEnum.strong);
+    }
+    static emphasis(content) {
+        return new MdInline(content, types_1.MdNodeTypeEnum.emph);
     }
 }
 exports.MdInline = MdInline;
@@ -504,6 +516,7 @@ var MdNodeTypeEnum;
     MdNodeTypeEnum[MdNodeTypeEnum["code_block"] = 13] = "code_block";
     MdNodeTypeEnum[MdNodeTypeEnum["html_block"] = 14] = "html_block";
     MdNodeTypeEnum[MdNodeTypeEnum["table"] = 15] = "table";
+    MdNodeTypeEnum[MdNodeTypeEnum["text"] = 16] = "text";
 })(MdNodeTypeEnum = exports.MdNodeTypeEnum || (exports.MdNodeTypeEnum = {}));
 
 

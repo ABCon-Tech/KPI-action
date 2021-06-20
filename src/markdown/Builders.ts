@@ -85,7 +85,12 @@ export class MdInlineBuilder extends AbstractBuilder<MdInline> {
   }
 
   build(): MdInline {
-    throw new Error('Method not implemented.')
+    const string = ''
+
+    for (const part of this.contents) {
+      string.concat(part.content as string)
+    }
+    return MdInline.text(string)
   }
 }
 
