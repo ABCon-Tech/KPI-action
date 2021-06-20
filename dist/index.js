@@ -88,8 +88,8 @@ function run() {
                     issues.push(issue);
                 }
             }
-            core.debug(`Total Number of Issues: ${issueCount.toString()}`);
-            core.debug(`Total Number of Pull Requests: ${pullCount.toString()}`);
+            core.info(`Total Number of Issues: ${issueCount.toString()}`);
+            core.info(`Total Number of Pull Requests: ${pullCount.toString()}`);
             const summaryBuilder = new Builders_1.MdDocumentBuilder('Summary');
             summaryBuilder
                 .heading(h => h.level(1).contentString('Progress Summary'))
@@ -243,7 +243,7 @@ class MdInlineBuilder extends AbstractBuilder {
         for (const part of this.contents) {
             string.concat(part.content);
         }
-        core.debug(this.contents.toString());
+        core.info(this.contents.toString());
         return MdNode_1.MdInline.text(string);
     }
 }
@@ -380,7 +380,7 @@ class MarkdownWriter {
         this.writeInline(stream, heading.content);
     }
     writeInline(stream, content) {
-        core.debug(`Writer: ${content.content}`);
+        core.info(`Writer: ${content.content}`);
         stream.write(content.content);
     }
     writePragraph(stream, paragraph) {
