@@ -171,10 +171,10 @@ function ListingBlock(
   summaryBuilder: MdDocumentBuilder,
   heading: string,
   level: MdHeadingLevel,
-  openIssues: any[],
-  openPulls: any[],
-  closedIssues: any[],
-  closedPulls: any[],
+  issuesOpen: any[],
+  pullsOpen: any[],
+  issuesClosed: any[],
+  pullsClosed: any[],
   listOpen: boolean,
   introduction?: string
 ) {
@@ -190,15 +190,15 @@ function ListingBlock(
         r
           .row([
             'Issues',
-            openIssues.length.toString(),
-            closedIssues.length.toString(),
-            (openIssues.length + closedIssues.length).toString()
+            issuesOpen.length.toString(),
+            issuesClosed.length.toString(),
+            (issuesOpen.length + issuesClosed.length).toString()
           ])
           .row([
             'Pull Requests',
-            openPulls.length.toString(),
-            closedPulls.length.toString(),
-            (openPulls.length + closedPulls.length).toString()
+            pullsOpen.length.toString(),
+            pullsClosed.length.toString(),
+            (pullsOpen.length + pullsClosed.length).toString()
           ])
       )
   )
@@ -210,7 +210,7 @@ function ListingBlock(
         .contentString('Open Issues')
     )
     summaryBuilder.paragraph(p => {
-      for (const issue of openIssues) {
+      for (const issue of issuesOpen) {
         p.text(`- #${issue.number} - ${issue.title}\n`)
       }
     })
@@ -221,7 +221,7 @@ function ListingBlock(
         .contentString('Open Pull Requests')
     )
     summaryBuilder.paragraph(p => {
-      for (const issue of openPulls) {
+      for (const issue of pullsOpen) {
         p.text(`- #${issue.number} - ${issue.title}\n`)
       }
     })
