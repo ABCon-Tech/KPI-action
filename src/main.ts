@@ -11,8 +11,12 @@ async function run(): Promise<void> {
     await io.mkdirP(outputDirectory)
 
     const octokit = github.getOctokit(token)
-    const owner = github.context.repo.owner
-    const repo = github.context.repo.repo
+    const owner =
+      process.env.DEBUG === 'true' ? 'bSI-InfraRoom' : github.context.repo.owner
+    const repo =
+      process.env.DEBUG === 'true'
+        ? 'IFC-Specification'
+        : github.context.repo.repo
     const runDate = new Date()
     const lastRunDate = minusDays(runDate, 7)
 
@@ -157,7 +161,7 @@ function catagoriseByLabel(
   if (
     issue.labels.some(l => {
       core.info(`catagoriseByLabel: ${l.name} & ${label}`)
-      return l.name == label
+      return l.name === label
     })
   ) {
     collector.push(issue)
@@ -207,7 +211,7 @@ function ListingBlock(
     )
     summaryBuilder.paragraph(p => {
       for (const issue of openIssues) {
-        p.text(`- #${issue.number} - ${issue.title}`)
+        p.text(`- #${issue.number} - ${issue.title}\n`)
       }
     })
 

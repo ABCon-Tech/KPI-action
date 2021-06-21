@@ -54,8 +54,8 @@ function run() {
             const outputDirectory = core.getInput('output-directory', { required: true });
             yield io.mkdirP(outputDirectory);
             const octokit = github.getOctokit(token);
-            const owner = github.context.repo.owner;
-            const repo = github.context.repo.repo;
+            const owner = process.env.DEBUG === "true" ? "bSI-InfraRoom" : github.context.repo.owner;
+            const repo = process.env.DEBUG === "true" ? "IFC-Specification" : github.context.repo.repo;
             const runDate = new Date();
             const lastRunDate = minusDays(runDate, 7);
             const iterator = octokit.paginate.iterator(octokit.rest.issues.listForRepo, {
@@ -86,26 +86,26 @@ function run() {
                             pullCount++;
                             if (issue.state === 'open') {
                                 openPulls.push(issue);
-                                catagoriseByLabel(issue, 'EXPRESS', openPullsExpress);
-                                catagoriseByLabel(issue, 'documentation', openPullsExpress);
+                                catagoriseByLabel(issue, "EXPRESS", openPullsExpress);
+                                catagoriseByLabel(issue, "documentation", openPullsExpress);
                             }
                             else {
                                 closedPulls.push(issue);
-                                catagoriseByLabel(issue, 'EXPRESS', closedPullsExpress);
-                                catagoriseByLabel(issue, 'documentation', closedPullsExpress);
+                                catagoriseByLabel(issue, "EXPRESS", closedPullsExpress);
+                                catagoriseByLabel(issue, "documentation", closedPullsExpress);
                             }
                         }
                         else {
                             issueCount++;
                             if (issue.state === 'open') {
                                 openIssues.push(issue);
-                                catagoriseByLabel(issue, 'EXPRESS', openIssuesExpress);
-                                catagoriseByLabel(issue, 'documentation', openIssuesExpress);
+                                catagoriseByLabel(issue, "EXPRESS", openIssuesExpress);
+                                catagoriseByLabel(issue, "documentation", openIssuesExpress);
                             }
                             else {
                                 closedIssues.push(issue);
-                                catagoriseByLabel(issue, 'EXPRESS', closedIssuesExpress);
-                                catagoriseByLabel(issue, 'documentation', closedIssuesExpress);
+                                catagoriseByLabel(issue, "EXPRESS", closedIssuesExpress);
+                                catagoriseByLabel(issue, "documentation", closedIssuesExpress);
                             }
                         }
                     }
@@ -166,7 +166,7 @@ function minusDays(date, days) {
 function catagoriseByLabel(issue, label, collector) {
     if (issue.labels.some(l => {
         core.info(`catagoriseByLabel: ${l.name} & ${label}`);
-        return l.name == label;
+        return l.name === label;
     })) {
         collector.push(issue);
     }
@@ -199,7 +199,7 @@ function ListingBlock(summaryBuilder, heading, level, openIssues, openPulls, clo
             .contentString('Open Issues'));
         summaryBuilder.paragraph(p => {
             for (const issue of openIssues) {
-                p.text(`- #${issue.number} - ${issue.title}`);
+                p.text(`- #${issue.number} - ${issue.title}\n`);
             }
         });
         summaryBuilder.heading(h => h
