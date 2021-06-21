@@ -86,26 +86,26 @@ function run() {
                             pullCount++;
                             if (issue.state === 'open') {
                                 openPulls.push(issue);
-                                catagoriseByLabel(issue, "EXPRESS", openPullsExpress);
-                                catagoriseByLabel(issue, "documentation", openPullsExpress);
+                                catagoriseByLabel(issue, 'EXPRESS', openPullsExpress);
+                                catagoriseByLabel(issue, 'documentation', openPullsExpress);
                             }
                             else {
                                 closedPulls.push(issue);
-                                catagoriseByLabel(issue, "EXPRESS", closedPullsExpress);
-                                catagoriseByLabel(issue, "documentation", closedPullsExpress);
+                                catagoriseByLabel(issue, 'EXPRESS', closedPullsExpress);
+                                catagoriseByLabel(issue, 'documentation', closedPullsExpress);
                             }
                         }
                         else {
                             issueCount++;
                             if (issue.state === 'open') {
                                 openIssues.push(issue);
-                                catagoriseByLabel(issue, "EXPRESS", openIssuesExpress);
-                                catagoriseByLabel(issue, "documentation", openIssuesExpress);
+                                catagoriseByLabel(issue, 'EXPRESS', openIssuesExpress);
+                                catagoriseByLabel(issue, 'documentation', openIssuesExpress);
                             }
                             else {
                                 closedIssues.push(issue);
-                                catagoriseByLabel(issue, "EXPRESS", closedIssuesExpress);
-                                catagoriseByLabel(issue, "documentation", closedIssuesExpress);
+                                catagoriseByLabel(issue, 'EXPRESS', closedIssuesExpress);
+                                catagoriseByLabel(issue, 'documentation', closedIssuesExpress);
                             }
                         }
                     }
@@ -147,8 +147,8 @@ function run() {
                 closedPulls.length.toString(),
                 pullCount.toString()
             ])));
-            ListingBlock(summaryBuilder, "Issues/Pull Requests effecting EXPRESS Schema", 2, openIssuesExpress, openPullsExpress, closedIssuesExpress, closedPullsExpress, true, "Current issues effecting the content of the EXPRESS schema for IFC4x3.");
-            ListingBlock(summaryBuilder, "Issues/Pull Requests effecting Documentation", 2, openIssuesDoc, openPullsDoc, closedIssuesDoc, closedPullsDoc, true, "Current issues effecting the content of the Documentation for IFC4x3.");
+            ListingBlock(summaryBuilder, 'Issues/Pull Requests effecting EXPRESS Schema', 2, openIssuesExpress, openPullsExpress, closedIssuesExpress, closedPullsExpress, true, 'Current issues effecting the content of the EXPRESS schema for IFC4x3.');
+            ListingBlock(summaryBuilder, 'Issues/Pull Requests effecting Documentation', 2, openIssuesDoc, openPullsDoc, closedIssuesDoc, closedPullsDoc, true, 'Current issues effecting the content of the Documentation for IFC4x3.');
             const summary = summaryBuilder.build();
             core.info(summary.blocks[0].content.content);
             summary.Save(outputDirectory);
@@ -191,16 +191,20 @@ function ListingBlock(summaryBuilder, heading, level, openIssues, openPulls, clo
         (openPulls.length + closedPulls.length).toString()
     ])));
     if (listOpen) {
-        summaryBuilder.heading(h => h.level(level + 1 > 6 ? level : level + 1).contentString("Open Issues"));
+        summaryBuilder.heading(h => h
+            .level(level + 1 > 6 ? level : (level + 1))
+            .contentString('Open Issues'));
         summaryBuilder.paragraph(p => {
             for (const issue of openIssues) {
                 p.text(`> #${issue.number} - ${issue.title}`);
             }
         });
-        summaryBuilder.heading(h => h.level(level + 1 > 6 ? level : level + 1).contentString("Open Pull Requests"));
+        summaryBuilder.heading(h => h
+            .level(level + 1 > 6 ? level : (level + 1))
+            .contentString('Open Pull Requests'));
         summaryBuilder.paragraph(p => {
             for (const issue of openPulls) {
-                p.text(`> #${issue.number} - ${issue.title}`);
+                p.text(`- #${issue.number} - ${issue.title}\n`);
             }
         });
     }

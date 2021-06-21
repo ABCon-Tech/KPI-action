@@ -213,7 +213,7 @@ function ListingBlock(
     )
     summaryBuilder.paragraph(p => {
       for (const issue of openPulls) {
-        p.text(`> #${issue.number} - ${issue.title}`)
+        p.text(`- #${issue.number} - ${issue.title}\n`)
       }
     })
   }
