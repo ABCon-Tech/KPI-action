@@ -198,7 +198,7 @@ function ListingBlock(summaryBuilder, heading, level, issuesOpen, pullsOpen, iss
             .contentString('Open Issues'));
         summaryBuilder.paragraph(p => {
             for (const issue of issuesOpen) {
-                p.text(`- [#${issue.number}](${issue.url}) - ${issue.title}\n`);
+                p.text(`- [#${issue.number}](${issue.html_url}) - ${issue.title}\n`);
             }
         });
         summaryBuilder.heading(h => h
@@ -206,7 +206,7 @@ function ListingBlock(summaryBuilder, heading, level, issuesOpen, pullsOpen, iss
             .contentString('Open Pull Requests'));
         summaryBuilder.paragraph(p => {
             for (const issue of pullsOpen) {
-                p.text(`- [#${issue.number}](${issue.url}) - ${issue.title}\n`);
+                p.text(`- [#${issue.number}](${issue.html_url}) - ${issue.title}\n`);
             }
         });
     }
