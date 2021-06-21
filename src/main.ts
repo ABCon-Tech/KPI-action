@@ -26,7 +26,8 @@ async function run(): Promise<void> {
         owner,
         repo,
         state: 'all',
-        per_page: 100
+        per_page: 100,
+        direction: 'asc'
       }
     )
 

@@ -64,7 +64,8 @@ function run() {
                 owner,
                 repo,
                 state: 'all',
-                per_page: 100
+                per_page: 100,
+                direction: "asc"
             });
             let issueCount = 0, pullCount = 0;
             const openIssues = [];
