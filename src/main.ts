@@ -207,7 +207,7 @@ function ListingBlock(
     )
     summaryBuilder.paragraph(p => {
       for (const issue of issuesOpen) {
-        p.text(`- #${issue.number} - ${issue.title}\n`)
+        p.text(`- [#${issue.number}](${issue.url}) - ${issue.title}\n`)
       }
     })
 
@@ -218,7 +218,7 @@ function ListingBlock(
     )
     summaryBuilder.paragraph(p => {
       for (const issue of pullsOpen) {
-        p.text(`- #${issue.number} - ${issue.title}\n`)
+        p.text(`- [#${issue.number}](${issue.url}) - ${issue.title}\n`)
       }
     })
   }
