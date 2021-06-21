@@ -62,11 +62,21 @@ function run() {
                 owner,
                 repo,
                 state: 'all',
-                per_page: 100,
+                per_page: 100
             });
-            let issueCount = 0, pullCount = 0, openIssues = 0, closedIssues = 0, openPulls = 0, closedPulls = 0, openIssuesWeek = 0, closedIssuesWeek = 0, openPullsWeek = 0, closedPullsWeek = 0;
-            const issues = [];
-            const pulls = [];
+            let issueCount = 0, pullCount = 0;
+            const openIssues = [];
+            const openPulls = [];
+            const closedIssues = [];
+            const closedPulls = [];
+            const openPullsExpress = [];
+            const openIssuesExpress = [];
+            const closedPullsExpress = [];
+            const closedIssuesExpress = [];
+            const openPullsDoc = [];
+            const openIssuesDoc = [];
+            const closedPullsDoc = [];
+            const closedIssuesDoc = [];
             try {
                 //Sorting and data processing
                 for (var iterator_1 = __asyncValues(iterator), iterator_1_1; iterator_1_1 = yield iterator_1.next(), !iterator_1_1.done;) {
@@ -75,30 +85,28 @@ function run() {
                         if (issue.hasOwnProperty('pull_request')) {
                             pullCount++;
                             if (issue.state === 'open') {
-                                openPulls++;
-                                new Date(issue.created_at) > lastRunDate && openPullsWeek++;
+                                openPulls.push(issue);
+                                catagoriseByLabel(issue, "EXPRESS", openPullsExpress);
+                                catagoriseByLabel(issue, "documentation", openPullsExpress);
                             }
                             else {
-                                closedPulls++;
-                                issue.closed_at &&
-                                    new Date(issue.closed_at) > lastRunDate &&
-                                    closedPullsWeek++;
+                                closedPulls.push(issue);
+                                catagoriseByLabel(issue, "EXPRESS", closedPullsExpress);
+                                catagoriseByLabel(issue, "documentation", closedPullsExpress);
                             }
-                            pulls.push(issue);
                         }
                         else {
                             issueCount++;
                             if (issue.state === 'open') {
-                                openIssues++;
-                                new Date(issue.created_at) > lastRunDate && openIssuesWeek++;
+                                openIssues.push(issue);
+                                catagoriseByLabel(issue, "EXPRESS", openIssuesExpress);
+                                catagoriseByLabel(issue, "documentation", openIssuesExpress);
                             }
                             else {
-                                closedIssues++;
-                                issue.closed_at &&
-                                    new Date(issue.closed_at) > lastRunDate &&
-                                    closedIssuesWeek++;
+                                closedIssues.push(issue);
+                                catagoriseByLabel(issue, "EXPRESS", closedIssuesExpress);
+                                catagoriseByLabel(issue, "documentation", closedIssuesExpress);
                             }
-                            issues.push(issue);
                         }
                     }
                 }
@@ -123,29 +131,24 @@ function run() {
                 .heading(h => h.level(2).contentString('Summary Table'))
                 .table(t => t
                 .columnString('Indicator')
-                .columnString('Open')
+                .columnString('Opened')
                 .columnString('Closed')
+                .columnString('Total')
                 .rows(r => r
                 .row([
-                'Total Issues',
-                openIssues.toString(),
-                closedIssues.toString()
+                'Issues',
+                openIssues.length.toString(),
+                closedIssues.length.toString(),
+                issueCount.toString()
             ])
                 .row([
-                'Total Pull Requests',
-                openPulls.toString(),
-                closedPulls.toString()
-            ])
-                .row([
-                'Issues This Week',
-                openIssuesWeek.toString(),
-                closedIssuesWeek.toString()
-            ])
-                .row([
-                'Pull Requests This Week',
-                openPullsWeek.toString(),
-                closedPullsWeek.toString()
+                'Pull Requests',
+                openPulls.length.toString(),
+                closedPulls.length.toString(),
+                pullCount.toString()
             ])));
+            ListingBlock(summaryBuilder, "Issues/Pull Requests effecting EXPRESS Schema", 2, openIssuesExpress, openPullsExpress, closedIssuesExpress, closedPullsExpress, true, "Current issues effecting the content of the EXPRESS schema for IFC4x3.");
+            ListingBlock(summaryBuilder, "Issues/Pull Requests effecting Documentation", 2, openIssuesDoc, openPullsDoc, closedIssuesDoc, closedPullsDoc, true, "Current issues effecting the content of the Documentation for IFC4x3.");
             const summary = summaryBuilder.build();
             core.info(summary.blocks[0].content.content);
             summary.Save(outputDirectory);
@@ -159,6 +162,48 @@ run();
 function minusDays(date, days) {
     const ms = date.getMilliseconds() - days * 24 * 60 * 1000;
     return new Date(ms);
+}
+function catagoriseByLabel(issue, label, collector) {
+    if (issue.labels.some(l => l.name === label)) {
+        collector.push(issue);
+    }
+}
+function ListingBlock(summaryBuilder, heading, level, openIssues, openPulls, closedIssues, closedPulls, listOpen, introduction) {
+    summaryBuilder.heading(h => h.level(level).contentString(heading));
+    if (introduction)
+        summaryBuilder.paragraph(p => p.text(introduction));
+    summaryBuilder.table(t => t
+        .columnString('Indicator')
+        .columnString('Opened')
+        .columnString('Closed')
+        .columnString('Total')
+        .rows(r => r
+        .row([
+        'Issues',
+        openIssues.length.toString(),
+        closedIssues.length.toString(),
+        (openIssues.length + closedIssues.length).toString()
+    ])
+        .row([
+        'Pull Requests',
+        openPulls.length.toString(),
+        closedPulls.length.toString(),
+        (openPulls.length + closedPulls.length).toString()
+    ])));
+    if (listOpen) {
+        summaryBuilder.heading(h => h.level(level + 1 > 6 ? level : level + 1).contentString("Open Issues"));
+        summaryBuilder.paragraph(p => {
+            for (const issue of openIssues) {
+                p.text(`> #${issue.number} - ${issue.title}`);
+            }
+        });
+        summaryBuilder.heading(h => h.level(level + 1 > 6 ? level : level + 1).contentString("Open Pull Requests"));
+        summaryBuilder.paragraph(p => {
+            for (const issue of openPulls) {
+                p.text(`> #${issue.number} - ${issue.title}`);
+            }
+        });
+    }
 }
 
 

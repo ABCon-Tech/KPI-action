@@ -1,7 +1,7 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
 import * as io from '@actions/io'
-import {MdHeading} from './markdown'
+import {MdHeading, MdHeadingLevel} from './markdown'
 import {MdDocumentBuilder} from './markdown/Builders'
 
 async function run(): Promise<void> {
@@ -27,17 +27,19 @@ async function run(): Promise<void> {
     )
 
     let issueCount = 0,
-      pullCount = 0,
-      openIssues = 0,
-      closedIssues = 0,
-      openPulls = 0,
-      closedPulls = 0,
-      openIssuesWeek = 0,
-      closedIssuesWeek = 0,
-      openPullsWeek = 0,
-      closedPullsWeek = 0
-    const issues = []
-    const pulls = []
+      pullCount = 0
+    const openIssues = []
+    const openPulls = []
+    const closedIssues = []
+    const closedPulls = []
+    const openPullsExpress: any[] = []
+    const openIssuesExpress: any[] = []
+    const closedPullsExpress: any[] = []
+    const closedIssuesExpress: any[] = []
+    const openPullsDoc: any[] = []
+    const openIssuesDoc: any[] = []
+    const closedPullsDoc: any[] = []
+    const closedIssuesDoc: any[] = []
 
     //Sorting and data processing
     for await (const {data} of iterator) {
@@ -45,27 +47,25 @@ async function run(): Promise<void> {
         if (issue.hasOwnProperty('pull_request')) {
           pullCount++
           if (issue.state === 'open') {
-            openPulls++
-            new Date(issue.created_at) > lastRunDate && openPullsWeek++
+            openPulls.push(issue)
+            catagoriseByLabel(issue, 'EXPRESS', openPullsExpress)
+            catagoriseByLabel(issue, 'documentation', openPullsExpress)
           } else {
-            closedPulls++
-            issue.closed_at &&
-              new Date(issue.closed_at) > lastRunDate &&
-              closedPullsWeek++
+            closedPulls.push(issue)
+            catagoriseByLabel(issue, 'EXPRESS', closedPullsExpress)
+            catagoriseByLabel(issue, 'documentation', closedPullsExpress)
           }
-          pulls.push(issue)
         } else {
           issueCount++
           if (issue.state === 'open') {
-            openIssues++
-            new Date(issue.created_at) > lastRunDate && openIssuesWeek++
+            openIssues.push(issue)
+            catagoriseByLabel(issue, 'EXPRESS', openIssuesExpress)
+            catagoriseByLabel(issue, 'documentation', openIssuesExpress)
           } else {
-            closedIssues++
-            issue.closed_at &&
-              new Date(issue.closed_at) > lastRunDate &&
-              closedIssuesWeek++
+            closedIssues.push(issue)
+            catagoriseByLabel(issue, 'EXPRESS', closedIssuesExpress)
+            catagoriseByLabel(issue, 'documentation', closedIssuesExpress)
           }
-          issues.push(issue)
         }
       }
     }
@@ -91,32 +91,48 @@ async function run(): Promise<void> {
       .table(t =>
         t
           .columnString('Indicator')
-          .columnString('Open')
+          .columnString('Opened')
           .columnString('Closed')
+          .columnString('Total')
           .rows(r =>
             r
               .row([
-                'Total Issues',
-                openIssues.toString(),
-                closedIssues.toString()
+                'Issues',
+                openIssues.length.toString(),
+                closedIssues.length.toString(),
+                issueCount.toString()
               ])
               .row([
-                'Total Pull Requests',
-                openPulls.toString(),
-                closedPulls.toString()
-              ])
-              .row([
-                'Issues This Week',
-                openIssuesWeek.toString(),
-                closedIssuesWeek.toString()
-              ])
-              .row([
-                'Pull Requests This Week',
-                openPullsWeek.toString(),
-                closedPullsWeek.toString()
+                'Pull Requests',
+                openPulls.length.toString(),
+                closedPulls.length.toString(),
+                pullCount.toString()
               ])
           )
       )
+    ListingBlock(
+      summaryBuilder,
+      'Issues/Pull Requests effecting EXPRESS Schema',
+      2,
+      openIssuesExpress,
+      openPullsExpress,
+      closedIssuesExpress,
+      closedPullsExpress,
+      true,
+      'Current issues effecting the content of the EXPRESS schema for IFC4x3.'
+    )
+
+    ListingBlock(
+      summaryBuilder,
+      'Issues/Pull Requests effecting Documentation',
+      2,
+      openIssuesDoc,
+      openPullsDoc,
+      closedIssuesDoc,
+      closedPullsDoc,
+      true,
+      'Current issues effecting the content of the Documentation for IFC4x3.'
+    )
 
     const summary = summaryBuilder.build()
     core.info((summary.blocks[0] as MdHeading).content.content)
@@ -131,4 +147,74 @@ run()
 function minusDays(date: Date, days: number): Date {
   const ms = date.getMilliseconds() - days * 24 * 60 * 1000
   return new Date(ms)
+}
+
+function catagoriseByLabel(
+  issue: {labels: any[]},
+  label: any,
+  collector: any[]
+) {
+  if (issue.labels.some(l => l.name === label)) {
+    collector.push(issue)
+  }
+}
+function ListingBlock(
+  summaryBuilder: MdDocumentBuilder,
+  heading: string,
+  level: MdHeadingLevel,
+  openIssues: any[],
+  openPulls: any[],
+  closedIssues: any[],
+  closedPulls: any[],
+  listOpen: boolean,
+  introduction?: string
+) {
+  summaryBuilder.heading(h => h.level(level).contentString(heading))
+  if (introduction) summaryBuilder.paragraph(p => p.text(introduction))
+  summaryBuilder.table(t =>
+    t
+      .columnString('Indicator')
+      .columnString('Opened')
+      .columnString('Closed')
+      .columnString('Total')
+      .rows(r =>
+        r
+          .row([
+            'Issues',
+            openIssues.length.toString(),
+            closedIssues.length.toString(),
+            (openIssues.length + closedIssues.length).toString()
+          ])
+          .row([
+            'Pull Requests',
+            openPulls.length.toString(),
+            closedPulls.length.toString(),
+            (openPulls.length + closedPulls.length).toString()
+          ])
+      )
+  )
+
+  if (listOpen) {
+    summaryBuilder.heading(h =>
+      h
+        .level(level + 1 > 6 ? level : ((level + 1) as MdHeadingLevel))
+        .contentString('Open Issues')
+    )
+    summaryBuilder.paragraph(p => {
+      for (const issue of openIssues) {
+        p.text(`> #${issue.number} - ${issue.title}`)
+      }
+    })
+
+    summaryBuilder.heading(h =>
+      h
+        .level(level + 1 > 6 ? level : ((level + 1) as MdHeadingLevel))
+        .contentString('Open Pull Requests')
+    )
+    summaryBuilder.paragraph(p => {
+      for (const issue of openPulls) {
+        p.text(`> #${issue.number} - ${issue.title}`)
+      }
+    })
+  }
 }
