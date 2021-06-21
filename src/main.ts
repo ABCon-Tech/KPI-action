@@ -53,22 +53,22 @@ async function run(): Promise<void> {
           if (issue.state === 'open') {
             openPulls.push(issue)
             catagoriseByLabel(issue, 'EXPRESS', openPullsExpress)
-            catagoriseByLabel(issue, 'documentation', openPullsExpress)
+            catagoriseByLabel(issue, 'documentation', openPullsDoc)
           } else {
             closedPulls.push(issue)
             catagoriseByLabel(issue, 'EXPRESS', closedPullsExpress)
-            catagoriseByLabel(issue, 'documentation', closedPullsExpress)
+            catagoriseByLabel(issue, 'documentation', closedPullsDoc)
           }
         } else {
           issueCount++
           if (issue.state === 'open') {
             openIssues.push(issue)
             catagoriseByLabel(issue, 'EXPRESS', openIssuesExpress)
-            catagoriseByLabel(issue, 'documentation', openIssuesExpress)
+            catagoriseByLabel(issue, 'documentation', openIssuesDoc)
           } else {
             closedIssues.push(issue)
             catagoriseByLabel(issue, 'EXPRESS', closedIssuesExpress)
-            catagoriseByLabel(issue, 'documentation', closedIssuesExpress)
+            catagoriseByLabel(issue, 'documentation', closedIssuesDoc)
           }
         }
       }
@@ -158,15 +158,11 @@ function catagoriseByLabel(
   label: any,
   collector: any[]
 ) {
-  if (
-    issue.labels.some(l => {
-      core.info(`catagoriseByLabel: ${l.name} & ${label}`)
-      return l.name === label
-    })
-  ) {
+  if (issue.labels.some(l => l.name === label)) {
     collector.push(issue)
   }
 }
+
 function ListingBlock(
   summaryBuilder: MdDocumentBuilder,
   heading: string,
