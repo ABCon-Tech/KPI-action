@@ -1,11 +1,15 @@
-name: 'Your name here'
-description: 'Provide a description here'
-author: 'Your name or organization here'
+name: 'KPI-action'
+description: 'Action that generates Markdown reports for Key Performance Indicators (KPIs)'
+author: 'AB Consulting & Technologies'
 inputs:
-  milliseconds: # change this
+  repo-token: # change this
     required: true
-    description: 'input description here'
-    default: 'default value if applicable'
+    description: 'The GITHUB_TOKEN secret'
+    default: ${{ github.token }}
+  output-directory:
+    description: 'The path for the markdown outputs'
+    default: '${{ github.workspace }}/Management'
+    required: false
 runs:
   using: 'node12'
   main: 'dist/index.js'

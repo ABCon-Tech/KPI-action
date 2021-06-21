@@ -20,5 +20,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: ./
+      - uses: actions/upload-artifact@v2
         with:
-          milliseconds: 1000
+          name: summary
+          path: ${{ github.workspace }}/Management/Summary.md
