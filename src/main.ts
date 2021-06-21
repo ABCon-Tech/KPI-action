@@ -16,11 +16,15 @@ async function run(): Promise<void> {
     const runDate = new Date()
     const lastRunDate = minusDays(runDate, 7)
 
-    const {data} = await octokit.rest.issues.listForRepo({
-      owner,
-      repo,
-      state: 'all'
-    })
+    const iterator = octokit.paginate.iterator(
+      octokit.rest.issues.listForRepo,
+      {
+        owner,
+        repo,
+        state: 'all',
+        per_page: 100
+      }
+    )
 
     let issueCount = 0,
       pullCount = 0,
@@ -36,31 +40,33 @@ async function run(): Promise<void> {
     const pulls = []
 
     //Sorting and data processing
-    for (const issue of data) {
-      if (issue.hasOwnProperty('pull_request')) {
-        pullCount++
-        if (issue.state === 'open') {
-          openPulls++
-          new Date(issue.created_at) > lastRunDate && openPullsWeek++
+    for await (const {data} of iterator) {
+      for (const issue of data) {
+        if (issue.hasOwnProperty('pull_request')) {
+          pullCount++
+          if (issue.state === 'open') {
+            openPulls++
+            new Date(issue.created_at) > lastRunDate && openPullsWeek++
+          } else {
+            closedPulls++
+            issue.closed_at &&
+              new Date(issue.closed_at) > lastRunDate &&
+              closedPullsWeek++
+          }
+          pulls.push(issue)
         } else {
-          closedPulls++
-          issue.closed_at &&
-            new Date(issue.closed_at) > lastRunDate &&
-            closedPullsWeek++
+          issueCount++
+          if (issue.state === 'open') {
+            openIssues++
+            new Date(issue.created_at) > lastRunDate && openIssuesWeek++
+          } else {
+            closedIssues++
+            issue.closed_at &&
+              new Date(issue.closed_at) > lastRunDate &&
+              closedIssuesWeek++
+          }
+          issues.push(issue)
         }
-        pulls.push(issue)
-      } else {
-        issueCount++
-        if (issue.state === 'open') {
-          openIssues++
-          new Date(issue.created_at) > lastRunDate && openIssuesWeek++
-        } else {
-          closedIssues++
-          issue.closed_at &&
-            new Date(issue.closed_at) > lastRunDate &&
-            closedIssuesWeek++
-        }
-        issues.push(issue)
       }
     }
 

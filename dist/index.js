@@ -34,12 +34,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __asyncValues = (this && this.__asyncValues) || function (o) {
+    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
+    var m = o[Symbol.asyncIterator], i;
+    return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
+    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
+    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
+};
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const core = __importStar(__nccwpck_require__(2186));
 const github = __importStar(__nccwpck_require__(5438));
 const io = __importStar(__nccwpck_require__(7436));
 const Builders_1 = __nccwpck_require__(7931);
 function run() {
+    var e_1, _a;
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const token = core.getInput('repo-token', { required: true });
@@ -50,44 +58,57 @@ function run() {
             const repo = github.context.repo.repo;
             const runDate = new Date();
             const lastRunDate = minusDays(runDate, 7);
-            const { data } = yield octokit.rest.issues.listForRepo({
+            const iterator = octokit.paginate.iterator(octokit.rest.issues.listForRepo, {
                 owner,
                 repo,
-                state: 'all'
+                state: 'all',
+                per_page: 100,
             });
             let issueCount = 0, pullCount = 0, openIssues = 0, closedIssues = 0, openPulls = 0, closedPulls = 0, openIssuesWeek = 0, closedIssuesWeek = 0, openPullsWeek = 0, closedPullsWeek = 0;
             const issues = [];
             const pulls = [];
-            //Sorting and data processing
-            for (const issue of data) {
-                if (issue.hasOwnProperty('pull_request')) {
-                    pullCount++;
-                    if (issue.state === 'open') {
-                        openPulls++;
-                        new Date(issue.created_at) > lastRunDate && openPullsWeek++;
+            try {
+                //Sorting and data processing
+                for (var iterator_1 = __asyncValues(iterator), iterator_1_1; iterator_1_1 = yield iterator_1.next(), !iterator_1_1.done;) {
+                    const { data } = iterator_1_1.value;
+                    for (const issue of data) {
+                        if (issue.hasOwnProperty('pull_request')) {
+                            pullCount++;
+                            if (issue.state === 'open') {
+                                openPulls++;
+                                new Date(issue.created_at) > lastRunDate && openPullsWeek++;
+                            }
+                            else {
+                                closedPulls++;
+                                issue.closed_at &&
+                                    new Date(issue.closed_at) > lastRunDate &&
+                                    closedPullsWeek++;
+                            }
+                            pulls.push(issue);
+                        }
+                        else {
+                            issueCount++;
+                            if (issue.state === 'open') {
+                                openIssues++;
+                                new Date(issue.created_at) > lastRunDate && openIssuesWeek++;
+                            }
+                            else {
+                                closedIssues++;
+                                issue.closed_at &&
+                                    new Date(issue.closed_at) > lastRunDate &&
+                                    closedIssuesWeek++;
+                            }
+                            issues.push(issue);
+                        }
                     }
-                    else {
-                        closedPulls++;
-                        issue.closed_at &&
-                            new Date(issue.closed_at) > lastRunDate &&
-                            closedPullsWeek++;
-                    }
-                    pulls.push(issue);
                 }
-                else {
-                    issueCount++;
-                    if (issue.state === 'open') {
-                        openIssues++;
-                        new Date(issue.created_at) > lastRunDate && openIssuesWeek++;
-                    }
-                    else {
-                        closedIssues++;
-                        issue.closed_at &&
-                            new Date(issue.closed_at) > lastRunDate &&
-                            closedIssuesWeek++;
-                    }
-                    issues.push(issue);
+            }
+            catch (e_1_1) { e_1 = { error: e_1_1 }; }
+            finally {
+                try {
+                    if (iterator_1_1 && !iterator_1_1.done && (_a = iterator_1.return)) yield _a.call(iterator_1);
                 }
+                finally { if (e_1) throw e_1.error; }
             }
             core.info(`Total Number of Issues: ${issueCount.toString()}`);
             core.info(`Total Number of Pull Requests: ${pullCount.toString()}`);
