@@ -164,7 +164,10 @@ function minusDays(date, days) {
     return new Date(ms);
 }
 function catagoriseByLabel(issue, label, collector) {
-    if (issue.labels.some(l => l.name === label)) {
+    if (issue.labels.some(l => {
+        core.info(`catagoriseByLabel: ${l.name} & ${label}`);
+        l.name == label;
+    })) {
         collector.push(issue);
     }
 }
@@ -196,7 +199,7 @@ function ListingBlock(summaryBuilder, heading, level, openIssues, openPulls, clo
             .contentString('Open Issues'));
         summaryBuilder.paragraph(p => {
             for (const issue of openIssues) {
-                p.text(`> #${issue.number} - ${issue.title}`);
+                p.text(`- #${issue.number} - ${issue.title}`);
             }
         });
         summaryBuilder.heading(h => h

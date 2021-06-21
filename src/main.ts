@@ -154,7 +154,12 @@ function catagoriseByLabel(
   label: any,
   collector: any[]
 ) {
-  if (issue.labels.some(l => l.name === label)) {
+  if (
+    issue.labels.some(l => {
+      core.info(`catagoriseByLabel: ${l.name} & ${label}`)
+      l.name == label
+    })
+  ) {
     collector.push(issue)
   }
 }
@@ -202,7 +207,7 @@ function ListingBlock(
     )
     summaryBuilder.paragraph(p => {
       for (const issue of openIssues) {
-        p.text(`> #${issue.number} - ${issue.title}`)
+        p.text(`- #${issue.number} - ${issue.title}`)
       }
     })
 
