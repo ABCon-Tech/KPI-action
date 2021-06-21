@@ -166,7 +166,7 @@ function minusDays(date, days) {
 function catagoriseByLabel(issue, label, collector) {
     if (issue.labels.some(l => {
         core.info(`catagoriseByLabel: ${l.name} & ${label}`);
-        l.name == label;
+        return l.name == label;
     })) {
         collector.push(issue);
     }
